@@ -3,25 +3,42 @@ name: Sign APK
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   sign:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Sign APK
-        uses: r0adkll/sign-android-release@v1
-        id: sign_app
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          releaseDirectory: .
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: tivitti
-          keyStorePassword: tivitti123
-          keyPassword: tivitti123
-          
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate keystore and sign APK
+        run: |
+          keytool -genkey -v \
+            -keystore tivitti.keystore \
+            -alias tivitti \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Salvatore Rotella, OU=TiVitti, O=TiVitti, L=Italy, S=Sicily, C=IT" \
+            -storepass tivitti123 \
+            -keypass tivitti123
+          jarsigner -verbose \
+            -sigalg SHA256withRSA \
+            -digestalg SHA-256 \
+            -keystore tivitti.keystore \
+            -storepass tivitti123 \
+            -keypass tivitti123 \
+            "Ti Vitti-unsigned.apk" tivitti
+          mv "Ti Vitti-unsigned.apk" "Ti Vitti-signed.apk"
+
       - name: Upload signed APK
         uses: actions/upload-artifact@v3
         with:
-          name: Ti-Vitti-signed
-          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
+          name: TiVitti-signed
+          path: "Ti Vitti-signed.apk"
