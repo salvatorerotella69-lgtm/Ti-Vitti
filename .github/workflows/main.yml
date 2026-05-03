@@ -1,0 +1,27 @@
+name: Sign APK
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Sign APK
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: .
+          signingKeyBase64: ${{ secrets.KEYSTORE }}
+          alias: tivitti
+          keyStorePassword: tivitti123
+          keyPassword: tivitti123
+          
+      - name: Upload signed APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Ti-Vitti-signed
+          path: ${{ steps.sign_app.outputs.signedReleaseFile }}
