@@ -9,10 +9,10 @@ jobs:
   sign:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -38,7 +38,7 @@ jobs:
           mv "Ti Vitti-unsigned.apk" "Ti Vitti-signed.apk"
 
       - name: Upload signed APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TiVitti-signed
           path: "Ti Vitti-signed.apk"
